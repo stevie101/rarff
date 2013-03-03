@@ -79,7 +79,7 @@ module Rarff
 
     # Determine whether the given type is a date
     # At the moment a date attribute type needs to be preceeded with the date keyword
-    # TODO: Determine by matching to the JAVA SimpleDateFormat
+    # TODO: Determine by matching to the JAVA SimpleDateFormat (described here: http://docs.oracle.com/javase/1.4.2/docs/api/java/text/SimpleDateFormat.html)
     def check_date
       if @type =~ /^\s*date/i
         @type_is_date = true
@@ -112,6 +112,8 @@ module Rarff
     def to_arff
       if @type_is_nominal == true
         ATTRIBUTE_MARKER + " #{@name} {#{@type.join(',')}}"
+      elsif @type_is_date == true
+        ATTRIBUTE_MARKER + " #{@name} DATE #{@type}"
       else
         ATTRIBUTE_MARKER + " #{@name} #{@type}"
       end
