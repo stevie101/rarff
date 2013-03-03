@@ -63,8 +63,8 @@ module Rarff
     def initialize(name='', type='')
       @name = name
 
-      @type_is_nominal = false
-      @type_is_date = false
+      @type_is_nominal, @type_is_date, @type_is_string = false
+      
       @type = type
 
       check_nominal()
@@ -75,6 +75,7 @@ module Rarff
       @type = type
       check_nominal()
       check_date()
+      @type_is_string = true unless @type_is_nominal or @type_is_date
     end
 
     # Determine whether the given type is a date
@@ -110,6 +111,7 @@ module Rarff
 
 
     def to_arff
+      # TODO: Need to redo to use a single type_is variable rather than separate ones for each different type.
       if @type_is_nominal == true
         ATTRIBUTE_MARKER + " #{@name} {#{@type.join(',')}}"
       elsif @type_is_date == true
@@ -122,6 +124,17 @@ module Rarff
 
     def to_s
       to_arff
+    end
+
+    def type?
+      if @type_is_date
+        return ATTRIBUTE_DATE
+      elsif @type_is_nominal
+        return ATTRIBUTE_NOMINAL
+      else
+        # Default is string
+        return ATTRIBUTE_STRING
+      end
     end
 
   end
@@ -226,13 +239,15 @@ module Rarff
               # Quote strings with spaces.
               # TODO: Doesn't handle cases in which strings already contain
               # quotes or are already quoted.
-              if @attributes[i].type =~ /^#{ATTRIBUTE_STRING}$/i
+              case @attributes[i].type?
+              when ATTRIBUTE_STRING
                 if col =~ /\s+/
                   col = "'" + col + "'"
                 end
-              elsif @attributes[i].type =~ /^#{ATTRIBUTE_DATE}/i ## Hack comparison. Ugh.
+              when ATTRIBUTE_DATE
                 col = '"' + col + '"'
               end
+              
               col
             }.join(', ')
           }.join("\n")
