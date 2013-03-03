@@ -64,6 +64,7 @@ module Rarff
       @name = name
 
       @type_is_nominal = false
+      @type_is_date = false
       @type = type
 
       check_nominal()
@@ -73,8 +74,19 @@ module Rarff
     def type=(type)
       @type = type
       check_nominal()
+      check_date()
     end
 
+    # Determine whether the given type is a date
+    # At the moment a date attribute type needs to be preceeded with the date keyword
+    # TODO: Determine by matching to the JAVA SimpleDateFormat
+    def check_date
+      if @type =~ /^\s*date/i
+        @type_is_date = true
+        # Remove the preceeding date specifier (we'll add it again within the to_arff method)
+        @type = @type.gsub(/^\s*date.\s*/i,'')
+      end
+    end
 
     # Convert string representation of nominal type to array, if necessary
     # TODO: This might falsely trigger on wacky date formats.
