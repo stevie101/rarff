@@ -99,7 +99,7 @@ module Rarff
 
     def to_arff
       if @type_is_nominal == true
-        ATTRIBUTE_MARKER + " #{@name} #{@type.join(',')}"
+        ATTRIBUTE_MARKER + " #{@name} {#{@type.join(',')}}"
       else
         ATTRIBUTE_MARKER + " #{@name} #{@type}"
       end
